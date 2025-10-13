@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance List</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-top: 30px;
+}
+
+table {
+  margin: 30px auto;
+  border-collapse: collapse;
+  width: 80%;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+  </style>
+</head>
+<body>
+  <h1>Attendance List</h1>
+
+  <table>
+    <tr>
+      <th rowspan="2">Student ID</th>
+      <th rowspan="2">Last Name</th>
+      <th rowspan="2">First Name</th>
+      <th rowspan="2">Course</th>
+      <th colspan="2">Session Date</th>
+    </tr>
+    <tr>
+      <th>Present</th>
+      <th>Participated</th>
+    </tr>
+    <tr>
+      <td>001</td>
+      <td>Azouaou</td>
+      <td>Lina</td>
+      <td>Web Development</td>
+      <td><input type="checkbox"></td>
+      <td><input type="checkbox"></td>
+    </tr>
+  </table>
+</body>
+</html>
