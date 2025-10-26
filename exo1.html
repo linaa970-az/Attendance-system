@@ -1,74 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Attendance List</title>
+  <title>Tableau de Présence Dynamique</title>
   <style>
     body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
-  margin: 0;
-  padding: 0;
-}
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+    }
 
-h1 {
-  text-align: center;
-  color: #333;
-  margin-top: 30px;
-}
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-table {
-  margin: 30px auto;
-  border-collapse: collapse;
-  width: 80%;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: center;
-}
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+    }
 
-th {
-  background-color: #4CAF50;
-  color: white;
-  font-weight: bold;
-}
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
 
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+    .col-last, .col-first {
+      text-align: left;
+      padding-left: 10px;
+      font-weight: 600;
+    }
 
-tr:hover {
-  background-color: #f1f1f1;
-}
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    td input {
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Dynamic colors */
+    .green-row td { background-color: #d4edda !important; }   /* good */
+    .yellow-row td { background-color: #fff3cd !important; }  /* warning */
+    .red-row td { background-color: #f8d7da !important; }     /* excluded */
   </style>
 </head>
 <body>
-  <h1>Attendance List</h1>
 
-  <table>
-    <tr>
-      <th rowspan="2">Student ID</th>
-      <th rowspan="2">Last Name</th>
-      <th rowspan="2">First Name</th>
-      <th rowspan="2">Course</th>
-      <th colspan="2">Session Date</th>
-    </tr>
-    <tr>
-      <th>Present</th>
-      <th>Participated</th>
-    </tr>
-    <tr>
-      <td>001</td>
-      <td>Azouaou</td>
-      <td>Lina</td>
-      <td>Web Development</td>
-      <td><input type="checkbox"></td>
-      <td><input type="checkbox"></td>
-    </tr>
+  <h2>Tableau de Présence Dynamique</h2>
+
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th rowspan="2">Last Name</th>
+        <th rowspan="2">First Name</th>
+        <th colspan="2">S1</th>
+        <th colspan="2">S2</th>
+        <th colspan="2">S3</th>
+        <th colspan="2">S4</th>
+        <th colspan="2">S5</th>
+        <th colspan="2">S6</th>
+        <th rowspan="2">Absences</th>
+        <th rowspan="2">Participation</th>
+        <th rowspan="2">Message</th>
+      </tr>
+      <tr>
+        <th>P</th><th>Pa</th>
+        <th>P</th><th>Pa</th>
+        <th>P</th><th>Pa</th>
+        <th>P</th><th>Pa</th>
+        <th>P</th><th>Pa</th>
+        <th>P</th><th>Pa</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>Ahmed</td>
+        <td>Sara</td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      </tr>
+
+      <tr>
+        <td>Yacine</td>
+        <td>Ali</td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      </tr>
+
+      <tr>
+        <td>Houcine</td>
+        <td>Rania</td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      </tr>
+      </tbody>
   </table>
+
+  <script>
+    const table = document.getElementById("attendanceTable");
+
+    function updateRow(row) {
+      const absencesCell = row.querySelector(".abs");
+      const partCell = row.querySelector(".part");
+      const msgCell = row.querySelector(".msg");
+
+      const pBoxes = row.querySelectorAll(".p");
+      const paBoxes = row.querySelectorAll(".pa");
+
+      // Absences = total sessions - checked P
+      const totalSessions = pBoxes.length;
+      const presentCount = [...pBoxes].filter(p => p.checked).length;
+      const absences = totalSessions - presentCount;
+
+      // Participations = number of checked Pa
+      const participation = [...paBoxes].filter(p => p.checked).length;
+
+      absencesCell.textContent = absences;
+      partCell.textContent = participation;
+
+      // Reset color classes
+      row.classList.remove("green-row", "yellow-row", "red-row");
+
+      // Determine color + message
+      if (absences < 3) {
+        row.classList.add("green-row");
+        msgCell.textContent = "Good attendance – Excellent participation";
+      } else if (absences >= 3 && absences <= 4) {
+        row.classList.add("yellow-row");
+        msgCell.textContent = "Warning – attendance low – You need to participate more";
+      } else {
+        row.classList.add("red-row");
+        msgCell.textContent = "Excluded – too many absences – You need to participate more";
+      }
+    }
+
+    // Listen for checkbox changes
+    table.querySelectorAll("input[type=checkbox]").forEach(box => {
+      box.addEventListener("change", e => {
+        const row = e.target.closest("tr");
+        updateRow(row);
+      });
+    });
+  </script>
+
 </body>
 </html>
