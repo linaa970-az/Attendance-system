@@ -110,43 +110,54 @@
   </div>
 
   <script>
-    document.getElementById("studentForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+   document.getElementById("studentForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-      document.querySelectorAll(".error").forEach(e => e.textContent = "");
+    document.querySelectorAll(".error").forEach(e => e.textContent = "");
 
-      const studentId = document.getElementById("studentId").value.trim();
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      const email = document.getElementById("email").value.trim();
+    const studentId = document.getElementById("studentId").value.trim();
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
 
-      let valid = true;
+    let valid = true;
 
-      if (studentId === "" || !/^\d+$/.test(studentId)) {
-        document.getElementById("idError").textContent = "Student ID must contain only numbers.";
-        valid = false;
-      }
+    if (studentId === "" || !/^\d+$/.test(studentId)) {
+      document.getElementById("idError").textContent = "Student ID must contain only numbers.";
+      valid = false;
+    }
 
-      if (firstName === "" || !/^[A-Za-z]+$/.test(firstName)) {
-        document.getElementById("firstNameError").textContent = "First name must contain only letters.";
-        valid = false;
-      }
+    if (firstName === "" || !/^[A-Za-z]+$/.test(firstName)) {
+      document.getElementById("firstNameError").textContent = "First name must contain only letters.";
+      valid = false;
+    }
 
-      if (lastName === "" || !/^[A-Za-z]+$/.test(lastName)) {
-        document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
-        valid = false;
-      }
+    if (lastName === "" || !/^[A-Za-z]+$/.test(lastName)) {
+      document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
+      valid = false;
+    }
 
-      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-      if (email === "" || !emailPattern.test(email)) {
-        document.getElementById("emailError").textContent = "Please enter a valid email (e.g., name@example.com).";
-        valid = false;
-      }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email === "" || !emailPattern.test(email)) {
+      document.getElementById("emailError").textContent = "Please enter a valid email (e.g., name@example.com).";
+      valid = false;
+    }
 
-      if (valid) {
-        alert("Form submitted successfully!");
-      }
-    });
+    if (valid) {
+      alert("Form submitted successfully!");
+
+      // 👇 Envoie les données vers la page Exo 1
+      window.opener.postMessage({
+        type: "addStudent",
+        lastName,
+        firstName,
+        email
+      }, "*");
+
+      // Ferme la fenêtre du formulaire (optionnel)
+      // window.close();
+    }
+  });
   </script>
 </body>
 </html>

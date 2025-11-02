@@ -127,55 +127,79 @@
         <td class="abs">0</td>
         <td class="part">0</td>
         <td class="msg"></td>
-      </tr>
-      </tbody>
+</tr>
+</tbody>
   </table>
 
   <script>
-    const table = document.getElementById("attendanceTable");
+  const table = document.getElementById("attendanceTable");
+  const tbody = table.querySelector("tbody");
 
-    function updateRow(row) {
-      const absencesCell = row.querySelector(".abs");
-      const partCell = row.querySelector(".part");
-      const msgCell = row.querySelector(".msg");
+  function updateRow(row) {
+    const absencesCell = row.querySelector(".abs");
+    const partCell = row.querySelector(".part");
+    const msgCell = row.querySelector(".msg");
 
-      const pBoxes = row.querySelectorAll(".p");
-      const paBoxes = row.querySelectorAll(".pa");
+    const pBoxes = row.querySelectorAll(".p");
+    const paBoxes = row.querySelectorAll(".pa");
 
-      // Absences = total sessions - checked P
-      const totalSessions = pBoxes.length;
-      const presentCount = [...pBoxes].filter(p => p.checked).length;
-      const absences = totalSessions - presentCount;
+    const totalSessions = pBoxes.length;
+    const presentCount = [...pBoxes].filter(p => p.checked).length;
+    const absences = totalSessions - presentCount;
+    const participation = [...paBoxes].filter(p => p.checked).length;
 
-      // Participations = number of checked Pa
-      const participation = [...paBoxes].filter(p => p.checked).length;
+    absencesCell.textContent = absences;
+    partCell.textContent = participation;
 
-      absencesCell.textContent = absences;
-      partCell.textContent = participation;
+    row.classList.remove("green-row", "yellow-row", "red-row");
 
-      // Reset color classes
-      row.classList.remove("green-row", "yellow-row", "red-row");
-
-      // Determine color + message
-      if (absences < 3) {
-        row.classList.add("green-row");
-        msgCell.textContent = "Good attendance – Excellent participation";
-      } else if (absences >= 3 && absences <= 4) {
-        row.classList.add("yellow-row");
-        msgCell.textContent = "Warning – attendance low – You need to participate more";
-      } else {
-        row.classList.add("red-row");
-        msgCell.textContent = "Excluded – too many absences – You need to participate more";
-      }
+    if (absences < 3) {
+      row.classList.add("green-row");
+      msgCell.textContent = "Good attendance – Excellent participation";
+    } else if (absences >= 3 && absences <= 4) {
+      row.classList.add("yellow-row");
+      msgCell.textContent = "Warning – attendance low – You need to participate more";
+    } else {
+      row.classList.add("red-row");
+      msgCell.textContent = "Excluded – too many absences – You need to participate more";
     }
+  }
 
-    // Listen for checkbox changes
-    table.querySelectorAll("input[type=checkbox]").forEach(box => {
+  function attachCheckboxListeners(row) {
+    row.querySelectorAll("input[type=checkbox]").forEach(box => {
       box.addEventListener("change", e => {
-        const row = e.target.closest("tr");
-        updateRow(row);
+        updateRow(e.target.closest("tr"));
       });
     });
+  }
+
+  // Active les checkbox existantes
+  table.querySelectorAll("tbody tr").forEach(attachCheckboxListeners);
+
+  // 👇 Réception du message venant de Exo 2
+  window.addEventListener("message", (event) => {
+    const data = event.data;
+    if (data.type === "addStudent") {
+      const { lastName, firstName } = data;
+
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+        <td>${lastName}</td>
+        <td>${firstName}</td>
+        ${Array(6).fill(0).map(() => `
+          <td><input type="checkbox" class="p"></td>
+          <td><input type="checkbox" class="pa"></td>
+        `).join('')}
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      `;
+      tbody.appendChild(newRow);
+      attachCheckboxListeners(newRow);
+      updateRow(newRow);
+      alert("✅ Étudiant ajouté avec succès !");
+    }
+  });
   </script>
 
 </body>
