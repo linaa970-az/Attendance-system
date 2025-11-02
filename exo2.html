@@ -2,64 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add New Student</title>
+  <title>Add Student</title>
   <style>
-form {
-  width: 400px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-label {
-  font-weight: bold;
-  color: #333;
-}
+    .container {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 350px;
+    }
 
-input[type="text"],
-input[type="email"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
 
-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-}
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-button:hover {
-  background-color: #45a049;
-}
+    label {
+      display: block;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
-  <h1>Add New Student</h1>
 
-  <form action="/submit-student" method="post">
-    <label for="studentId">Student ID:</label><br>
-    <input type="text" id="studentId" name="studentId"><br>
+  <div class="container">
+    <h2>Add Student</h2>
+    <form id="studentForm">
+      <div class="form-group">
+        <label for="studentId">Student ID:</label>
+        <input type="text" id="studentId" name="studentId">
+        <div class="error" id="idError"></div>
+      </div>
 
-    <label for="lastName">Last Name:</label><br>
-    <input type="text" id="lastName" name="lastName"><br>
+      <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName">
+        <div class="error" id="lastNameError"></div>
+      </div>
 
-    <label for="firstName">First Name:</label><br>
-    <input type="text" id="firstName" name="firstName"><br>
+      <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName">
+        <div class="error" id="firstNameError"></div>
+      </div>
 
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email"><br>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email">
+        <div class="error" id="emailError"></div>
+      </div>
 
-    <button type="submit">Submit</button>
-  </form>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("studentForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      document.querySelectorAll(".error").forEach(e => e.textContent = "");
+
+      const studentId = document.getElementById("studentId").value.trim();
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      let valid = true;
+
+      if (studentId === "" || !/^\d+$/.test(studentId)) {
+        document.getElementById("idError").textContent = "Student ID must contain only numbers.";
+        valid = false;
+      }
+
+      if (firstName === "" || !/^[A-Za-z]+$/.test(firstName)) {
+        document.getElementById("firstNameError").textContent = "First name must contain only letters.";
+        valid = false;
+      }
+
+      if (lastName === "" || !/^[A-Za-z]+$/.test(lastName)) {
+        document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
+        valid = false;
+      }
+
+      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (email === "" || !emailPattern.test(email)) {
+        document.getElementById("emailError").textContent = "Please enter a valid email (e.g., name@example.com).";
+        valid = false;
+      }
+
+      if (valid) {
+        alert("Form submitted successfully!");
+      }
+    });
+  </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Tableau de Présence Dynamique</title>
+  <title>Tableau de Présence + Formulaire</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -55,6 +55,66 @@
     .green-row td { background-color: #d4edda !important; }   /* good */
     .yellow-row td { background-color: #fff3cd !important; }  /* warning */
     .red-row td { background-color: #f8d7da !important; }     /* excluded */
+
+    /* Form styling */
+    .form-container {
+      width: 350px;
+      margin: 30px auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .success {
+      text-align: center;
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -100,39 +160,30 @@
         <td class="part">0</td>
         <td class="msg"></td>
       </tr>
-
-      <tr>
-        <td>Yacine</td>
-        <td>Ali</td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td class="abs">0</td>
-        <td class="part">0</td>
-        <td class="msg"></td>
-      </tr>
-
-<tr>
-        <td>Houcine</td>
-        <td>Rania</td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
-        <td class="abs">0</td>
-        <td class="part">0</td>
-        <td class="msg"></td>
-      </tr>
-      </tbody>
+    </tbody>
   </table>
+
+  <!-- Add Student Form -->
+  <div class="form-container">
+    <h3>Ajouter un étudiant</h3>
+    <form id="studentForm">
+      <label for="lastName">Nom:</label>
+      <input type="text" id="lastName" required>
+
+      <label for="firstName">Prénom:</label>
+      <input type="text" id="firstName" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
+
+      <button type="submit">Ajouter</button>
+      <div id="message" class="success"></div>
+    </form>
+  </div>
 
   <script>
     const table = document.getElementById("attendanceTable");
+    const tbody = table.querySelector("tbody");
 
     function updateRow(row) {
       const absencesCell = row.querySelector(".abs");
@@ -142,21 +193,16 @@
       const pBoxes = row.querySelectorAll(".p");
       const paBoxes = row.querySelectorAll(".pa");
 
-      // Absences = total sessions - checked P
       const totalSessions = pBoxes.length;
       const presentCount = [...pBoxes].filter(p => p.checked).length;
       const absences = totalSessions - presentCount;
-
-      // Participations = number of checked Pa
       const participation = [...paBoxes].filter(p => p.checked).length;
 
       absencesCell.textContent = absences;
       partCell.textContent = participation;
 
-      // Reset color classes
       row.classList.remove("green-row", "yellow-row", "red-row");
 
-      // Determine color + message
       if (absences < 3) {
         row.classList.add("green-row");
         msgCell.textContent = "Good attendance – Excellent participation";
@@ -169,14 +215,60 @@
       }
     }
 
-    // Listen for checkbox changes
-    table.querySelectorAll("input[type=checkbox]").forEach(box => {
-      box.addEventListener("change", e => {
-        const row = e.target.closest("tr");
-        updateRow(row);
+    // Attach event listener to checkboxes (dynamic)
+    function attachCheckboxListeners(row) {
+      row.querySelectorAll("input[type=checkbox]").forEach(box => {
+        box.addEventListener("change", e => {
+          updateRow(e.target.closest("tr"));
+        });
       });
-    });
-  </script>
+    }
 
+    // FORM HANDLING
+    document.getElementById("studentForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const lastName = document.getElementById("lastName").value.trim();
+      const firstName = document.getElementById("firstName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message");
+
+      if (!lastName  ||!firstName || !email) {
+        message.textContent = "Veuillez remplir tous les champs.";
+        message.style.color = "red";
+        return;
+      }
+
+      // Create new row identical to the template
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+        <td>${lastName}</td>
+        <td>${firstName}</td>
+        ${Array(6).fill(0).map(() => `
+          <td><input type="checkbox" class="p"></td>
+          <td><input type="checkbox" class="pa"></td>
+        `).join('')}
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      `;
+
+      tbody.appendChild(newRow);
+      attachCheckboxListeners(newRow);
+      updateRow(newRow);
+
+      message.textContent = "✅ Étudiant ajouté avec succès !";
+      message.style.color = "green";
+
+      // Clear form
+      document.getElementById("studentForm").reset();
+
+      // Hide message after 3 seconds
+      setTimeout(() => message.textContent = "", 3000);
+    });
+
+    // Activate checkboxes for existing rows
+    table.querySelectorAll("tbody tr").forEach(attachCheckboxListeners);
+     </script>
 </body>
 </html>
