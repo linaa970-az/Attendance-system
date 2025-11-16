@@ -2,10 +2,32 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Tableau de Présence Dynamique</title>
+  <title>Tableau de Présence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rapports</title>
+    <link rel="stylesheet" href="assets/style.css" />
+ 
+  <body>
+    <header class="site-header">
+      <nav class="navbar">
+        <a class="brand" href="index.html">Assiduité</a>
+        <button class="nav-toggle" aria-label="Basculer la navigation">☰</button>
+        <ul class="nav-links">
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="exo1.html">Liste d'assiduité</a></li>
+          <li><a href="exo2.html">Ajouter étudiant</a></li>
+          <li><a href="reports.html" aria-current="page">Rapports</a></li>
+          <li><a href="logout.html">Déconnexion</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main class="container">
+      <h1>Rapports</h1>
+      <p class="muted">Section de rapports – contenu à compléter selon vos besoins.</p>
+    </main>
+    
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    body {font-family: Arial, sans-serif;
       background: #f9f9f9;
       padding: 20px;
     }
@@ -55,6 +77,11 @@
     .green-row td { background-color: #d4edda !important; }   /* good */
     .yellow-row td { background-color: #fff3cd !important; }  /* warning */
     .red-row td { background-color: #f8d7da !important; }     /* excluded */
+    /* Hover léger qui respecte les couleurs dynamiques */
+#attendanceTable tbody tr:hover {
+    filter: brightness(1.15); /* éclaircit légèrement la ligne */
+    cursor: pointer;
+}
   </style>
 </head>
 <body>
@@ -114,8 +141,7 @@
         <td class="part">0</td>
         <td class="msg"></td>
       </tr>
-
-<tr>
+      <tr>
         <td>Houcine</td>
         <td>Rania</td>
         <td><input type="checkbox" class="p"></td><td><input type="checkbox" class="pa"></td>
@@ -127,30 +153,130 @@
         <td class="abs">0</td>
         <td class="part">0</td>
         <td class="msg"></td>
-</tr>
-</tbody>
-  </table>
-<script>
-  window.addEventListener("DOMContentLoaded", function() {
-  const students = JSON.parse(localStorage.getItem("students")) || [];
+      </tr>
+    </tbody></table>
 
-  const tableBody = document.querySelector("#attendanceTable tbody");
+  <script>
+    const table = document.getElementById("attendanceTable");
 
-  students.forEach(student => {
-    const row = document.createElement("tr");
+    // Fonction qui met à jour les absences et participations
+    function updateRow(row) {
+      const absencesCell = row.querySelector(".abs");
+      const partCell = row.querySelector(".part");
+      const msgCell = row.querySelector(".msg");
 
-    row.innerHTML = `
-      <td>${student.lastName}</td>
-      <td>${student.firstName}</td>
-      <td>${Array.from({ length: 6 }).map(() => `<input type='checkbox'>`).join("")}</td>
-      <td>${student.absences}</td>
-      <td>${student.participation}</td>
-      <td><input type='text' placeholder='Message'></td>
-    `;
+      const pBoxes = row.querySelectorAll(".p");
+      const paBoxes = row.querySelectorAll(".pa");
 
-    tableBody.appendChild(row);
-  });
-  });
-  </script>
+      const totalSessions = pBoxes.length;
+      const presentCount = [...pBoxes].filter(p => p.checked).length;
+      const absences = totalSessions - presentCount;
+      const participation = [...paBoxes].filter(p => p.checked).length;
+
+      absencesCell.textContent = absences;
+      partCell.textContent = participation;
+
+      row.classList.remove("green-row", "yellow-row", "red-row");
+
+      if (absences < 3) {
+        row.classList.add("green-row");
+        msgCell.textContent = "Good attendance – Excellent participation";
+      } else if (absences >= 3 && absences <= 4) {
+        row.classList.add("yellow-row");
+        msgCell.textContent = "Warning – attendance low – You need to participate more";
+      } else {
+        row.classList.add("red-row");
+        msgCell.textContent = "Excluded – too many absences – You need to participate more";
+      }
+    }
+
+    // Activation sur les étudiants déjà présents
+    table.querySelectorAll("input[type=checkbox]").forEach(box => {
+      box.addEventListener("change", e => {
+        const row = e.target.closest("tr");
+        updateRow(row);
+      });
+    });
+
+    // ---------------- Ajout automatique des étudiants ----------------
+
+    // Ajouter une nouvelle ligne pour un étudiant
+    function addStudentRow(student) {
+      const tbody = table.querySelector("tbody");
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${student.lastName}</td>
+        <td>${student.firstName}</td>
+        ${Array(6).fill('').map(() => `
+          <td><input type="checkbox" class="p"></td>
+          <td><input type="checkbox" class="pa"></td>
+        `).join('')}
+        <td class="abs">0</td>
+        <td class="part">0</td>
+        <td class="msg"></td>
+      `;
+
+      tbody.appendChild(row);
+
+      // Activer le calcul dynamique sur la nouvelle ligne
+      row.querySelectorAll("input[type=checkbox]").forEach(box => {
+        box.addEventListener("change", e => updateRow(row));
+      });
+    }
+
+    // Charger les étudiants ajoutés via addStudent.html
+    function loadStudents() {
+      const students = JSON.parse(localStorage.getItem('students')) || [];
+      const tbody = document.querySelector("#attendanceTable tbody");
+
+      students.forEach(student => {
+        const exists = [...tbody.querySelectorAll("tr")].some(r =>
+          r.cells[0].textContent === student.lastName &&
+          r.cells[1].textContent === student.firstName
+        );
+        if (!exists) addStudentRow(student);
+      });
+    }
+
+    // Charger les étudiants au démarrage
+    loadStudents();
+    // Écoute les ajouts en direct sans actualisation
+    window.addEventListener("storage", () => {
+      loadStudents();
+    });
+    
+$(document).ready(function() {
+    // Highlight row on hover
+    $("#attendanceTable tbody").on("mouseenter", "tr", function() {
+        $(this).css("background-color", "#cce5ff"); // light blue highlight
+    }).on("mouseleave", "tr", function() {
+        $(this).css("background-color", ""); // reset to original color / dynamic class
+    });
+
+    // Show student full name and number of absences on click
+    $("#attendanceTable tbody").on("click", "tr", function() {
+        const firstName = $(this).find("td:nth-child(2)").text();
+        const lastName = $(this).find("td:nth-child(1)").text();
+        const absences = $(this).find(".abs").text();
+        alert(`Student: ${firstName} ${lastName}\nAbsences: ${absences}`);
+    });
+});
+  // ---------------- jQuery pour clic sur ligne ----------------
+    $(document).ready(function() {
+        $("#attendanceTable tbody").on("click", "tr", function() {
+            const firstName = $(this).find("td:nth-child(2)").text();
+            const lastName = $(this).find("td:nth-child(1)").text();
+            const absences = $(this).find(".abs").text();
+            alert(`Student: ${firstName} ${lastName}\nAbsences: ${absences}`);
+        });
+    });
+     const toggle = document.querySelector('.nav-toggle');
+      const links = document.querySelector('.nav-links');
+      toggle?.addEventListener('click', () => links.classList.toggle('open'));
+   
+</script>
+  
+
 </body>
 </html>

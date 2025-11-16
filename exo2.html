@@ -13,7 +13,6 @@
       height: 100vh;
       margin: 0;
     }
-
     .container {
       background-color: #fff;
       padding: 30px 40px;
@@ -21,24 +20,20 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       width: 350px;
     }
-
     h2 {
       text-align: center;
       color: #333;
       margin-bottom: 25px;
     }
-
     .form-group {
       margin-bottom: 20px;
     }
-
     label {
       display: block;
       font-weight: bold;
       color: #333;
       margin-bottom: 5px;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -47,18 +42,6 @@
       box-sizing: border-box;
       font-size: 15px;
     }
-
-    input:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    .error {
-      color: red;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
     button {
       width: 100%;
       background-color: #28a745;
@@ -70,10 +53,10 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-
     button:hover {
       background-color: #218838;
     }
+    .error { color: red; font-size: 13px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -109,10 +92,11 @@
     </form>
   </div>
 
-  <script>
+<script>
 document.getElementById("studentForm").addEventListener("submit", function(event) {
   event.preventDefault();
 
+  // Effacer les erreurs
   document.querySelectorAll(".error").forEach(e => e.textContent = "");
 
   const studentId = document.getElementById("studentId").value.trim();
@@ -126,39 +110,39 @@ document.getElementById("studentForm").addEventListener("submit", function(event
     document.getElementById("idError").textContent = "Student ID must contain only numbers.";
     valid = false;
   }
+
   if (firstName === "" || !/^[A-Za-z]+$/.test(firstName)) {
     document.getElementById("firstNameError").textContent = "First name must contain only letters.";
     valid = false;
   }
+
   if (lastName === "" || !/^[A-Za-z]+$/.test(lastName)) {
     document.getElementById("lastNameError").textContent = "Last name must contain only letters.";
     valid = false;
   }
+
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (email === "" || !emailPattern.test(email)) {
-    document.getElementById("emailError").textContent = "Please enter a valid email (e.g., name@example.com).";
+    document.getElementById("emailError").textContent = "Please enter a valid email.";
     valid = false;
   }
 
   if (valid) {
-    // Charger la liste existante depuis localStorage
-    let students = JSON.parse(localStorage.getItem("students")) || [];
+    // Récupérer la liste existante
+    let students = JSON.parse(localStorage.getItem('students')) || [];
 
     // Ajouter le nouvel étudiant
-    students.push({
-      id: studentId,
-      firstName,
-      lastName,
-      email,
-      absences: 0,
-      participation: 0
-    });
+    students.push({ studentId, firstName, lastName, email });
 
-    // Sauvegarder la nouvelle liste
-    localStorage.setItem("students", JSON.stringify(students));
+    // Sauvegarder dans localStorage
+    localStorage.setItem('students', JSON.stringify(students));
 
-    alert("✅ Étudiant ajouté avec succès !");
-    window.location.href = "exo1.html"; // Retour automatique au tableau
+    // Déclencher un événement de mise à jour (pour une autre page ouverte)
+    window.dispatchEvent(new Event("storage"));
+
+    alert("Student added successfully!");
+    // Optionnel: vider les champs
+    document.getElementById("studentForm").reset();
   }
 });
 </script>

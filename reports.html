@@ -13,21 +13,49 @@
         <button class="nav-toggle" aria-label="Basculer la navigation">☰</button>
         <ul class="nav-links">
           <li><a href="index.html">Accueil</a></li>
-          <li><a href="exo1.html">Liste d'assiduité</a></li>
-          <li><a href="exo2.html">Ajouter étudiant</a></li>
+          <li><a href="attendance.html">Liste d'assiduité</a></li>
+          <li><a href="add.html">Ajouter étudiant</a></li>
           <li><a href="reports.html" aria-current="page">Rapports</a></li>
           <li><a href="logout.html">Déconnexion</a></li>
         </ul>
       </nav>
     </header>
+
     <main class="container">
       <h1>Rapports</h1>
-      <p class="muted">Section de rapports – contenu à compléter selon vos besoins.</p>
+      <p class="muted">Ici, vous pouvez générer des rapports d’assiduité, export CSV ou PDF, et visualiser les statistiques des étudiants.</p>
+
+      <!-- Exemple simple de rapport -->
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Absences</th>
+            <th>Participation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ahmed</td>
+            <td>Sara</td>
+            <td>2</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>Yacine</td>
+            <td>Ali</td>
+            <td>4</td>
+            <td>3</td>
+          </tr>
+        </tbody>
+      </table>
     </main>
+
     <script>
       const toggle = document.querySelector('.nav-toggle');
       const links = document.querySelector('.nav-links');
       toggle?.addEventListener('click', () => links.classList.toggle('open'));
     </script>
   </body>
-  </html>
+</html>
