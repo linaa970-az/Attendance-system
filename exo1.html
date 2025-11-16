@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rapports</title>
     <link rel="stylesheet" href="assets/style.css" />
- 
+    <!-- Include jQuery and Chart.js libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <body>
     <header class="site-header">
       <nav class="navbar">
@@ -16,7 +18,7 @@
           <li><a href="index.html">Accueil</a></li>
           <li><a href="exo1.html">Liste d'assiduité</a></li>
           <li><a href="exo2.html">Ajouter étudiant</a></li>
-          <li><a href="reports.html" aria-current="page">Rapports</a></li>
+      
           <li><a href="logout.html">Déconnexion</a></li>
         </ul>
       </nav>
@@ -77,16 +79,25 @@
     .green-row td { background-color: #d4edda !important; }   /* good */
     .yellow-row td { background-color: #fff3cd !important; }  /* warning */
     .red-row td { background-color: #f8d7da !important; }     /* excluded */
-    /* Hover léger qui respecte les couleurs dynamiques */
-#attendanceTable tbody tr:hover {
-    filter: brightness(1.15); /* éclaircit légèrement la ligne */
-    cursor: pointer;
-}
+    /* We handle row hover highlighting via jQuery below */
   </style>
 </head>
 <body>
 
   <h2>Tableau de Présence Dynamique</h2>
+
+  <!-- Controls for reports, highlighting, searching and sorting -->
+  <div id="controls" style="text-align:center; margin-bottom:20px;">
+    <button id="showReportBtn">Show Report</button>
+    <button id="highlightExcellentBtn">Highlight Excellent Students</button>
+    <button id="resetColorsBtn">Reset Colors</button>
+    <br /><br />
+    <label for="searchInput">Search by Name:</label>
+    <input type="text" id="searchInput" placeholder="Enter name">
+    <button id="sortAbsBtn">Sort by Absences (Ascending)</button>
+    <button id="sortPartBtn">Sort by Participation (Descending)</button>
+    <p id="sortMessage" style="margin-top:10px;"></p>
+  </div>
 
   <table id="attendanceTable">
     <thead>
@@ -155,6 +166,13 @@
         <td class="msg"></td>
       </tr>
     </tbody></table>
+
+  <!-- Section to display report results -->
+  <div id="reportSection" style="max-width:600px;margin:20px auto;display:none;">
+    <h3>Attendance Report</h3>
+    <canvas id="reportChart"></canvas>
+    <p id="reportSummary" style="text-align:center;margin-top:10px;"></p>
+  </div>
 
   <script>
     const table = document.getElementById("attendanceTable");
@@ -249,28 +267,137 @@
 $(document).ready(function() {
     // Highlight row on hover
     $("#attendanceTable tbody").on("mouseenter", "tr", function() {
-        $(this).css("background-color", "#cce5ff"); // light blue highlight
+        $(this).css("background-color", "#cce5ff");
     }).on("mouseleave", "tr", function() {
-        $(this).css("background-color", ""); // reset to original color / dynamic class
+        $(this).css("background-color", "");
     });
 
-    // Show student full name and number of absences on click
-    $("#attendanceTable tbody").on("click", "tr", function() {
-        const firstName = $(this).find("td:nth-child(2)").text();
-        const lastName = $(this).find("td:nth-child(1)").text();
+    // Show student's full name and number of absences on click (ignore clicks on checkboxes)
+    $("#attendanceTable tbody").on("click", "tr", function(e) {
+        // If the click originates in a cell that contains a checkbox (or the checkbox itself), ignore
+        const td = $(e.target).closest('td');
+        if (td.find('input[type=checkbox]').length > 0) {
+            return;
+        }
+        const firstName = $(this).children().eq(1).text();
+        const lastName = $(this).children().eq(0).text();
         const absences = $(this).find(".abs").text();
         alert(`Student: ${firstName} ${lastName}\nAbsences: ${absences}`);
     });
-});
-  // ---------------- jQuery pour clic sur ligne ----------------
-    $(document).ready(function() {
-        $("#attendanceTable tbody").on("click", "tr", function() {
-            const firstName = $(this).find("td:nth-child(2)").text();
-            const lastName = $(this).find("td:nth-child(1)").text();
-            const absences = $(this).find(".abs").text();
-            alert(`Student: ${firstName} ${lastName}\nAbsences: ${absences}`);
+
+    // Show Report button functionality
+    $("#showReportBtn").on("click", function() {
+        const rows = $("#attendanceTable tbody tr");
+        const totalStudents = rows.length;
+        let presentCount = 0;
+        let participateCount = 0;
+
+        rows.each(function() {
+            const pBoxes = $(this).find(".p");
+            const paBoxes = $(this).find(".pa");
+            const isPresent = pBoxes.is(':checked');
+            const isParticipate = paBoxes.is(':checked');
+            if (isPresent) presentCount++;
+            if (isParticipate) participateCount++;
+        });
+
+        // Update summary text
+        $("#reportSummary").text(
+            `Total Students: ${totalStudents}, Present: ${presentCount}, Participated: ${participateCount}`
+        );
+
+        // Draw a simple bar chart using Canvas API (no external dependencies)
+        const canvas = document.getElementById('reportChart');
+        const ctx = canvas.getContext('2d');
+        // Set canvas dimensions
+        const width = canvas.width = 400;
+        const height = canvas.height = 250;
+        // Data for bars
+        const values = [totalStudents, presentCount, participateCount];
+        const labels = ['Total', 'Present', 'Participated'];
+        const maxVal = Math.max(...values, 1);
+        const barWidth = width / values.length;
+        // Clear previous drawing
+        ctx.clearRect(0, 0, width, height);
+        // Set font for labels
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        // Draw each bar
+        values.forEach((val, i) => {
+            const barHeight = (val / maxVal) * (height - 50);
+            const x = i * barWidth + barWidth * 0.15;
+            const barActualWidth = barWidth * 0.7;
+            const y = height - barHeight - 20;
+            // Bar color (simple neutral color)
+            ctx.fillStyle = '#888';
+            ctx.fillRect(x, y, barActualWidth, barHeight);
+            // Draw value above bar
+            ctx.fillStyle = '#000';
+            ctx.fillText(val.toString(), x + barActualWidth / 2, y - 5);
+            // Draw label below bar
+            ctx.fillText(labels[i], x + barActualWidth / 2, height - 5);
+        });
+
+        $("#reportSection").show();
+    });
+
+    // Highlight Excellent Students button functionality
+    $("#highlightExcellentBtn").on("click", function() {
+        $("#attendanceTable tbody tr").each(function() {
+            const absences = parseInt($(this).find(".abs").text(), 10);
+            if (absences < 3) {
+                // animate background color change for excellent students
+                $(this).css('transition','background-color 1s');
+                $(this).css('background-color','#b3ffcc');
+            }
         });
     });
+
+    // Reset Colors button functionality
+    $("#resetColorsBtn").on("click", function() {
+        $("#attendanceTable tbody tr").each(function() {
+            $(this).css('background-color','');
+        });
+    });
+
+    // Search by name functionality
+    $("#searchInput").on("keyup", function() {
+        const searchTerm = $(this).val().toLowerCase();
+        $("#attendanceTable tbody tr").filter(function() {
+            const last = $(this).children().eq(0).text().toLowerCase();
+            const first = $(this).children().eq(1).text().toLowerCase();
+            $(this).toggle(last.includes(searchTerm) || first.includes(searchTerm));
+        });
+    });
+
+    // Sort by Absences (Ascending)
+    $("#sortAbsBtn").on("click", function() {
+        const rows = $("#attendanceTable tbody tr").get();
+        rows.sort(function(a, b) {
+            const absA = parseInt($(a).find(".abs").text(), 10);
+            const absB = parseInt($(b).find(".abs").text(), 10);
+            return absA - absB;
+        });
+        $.each(rows, function(index, row) {
+            $("#attendanceTable tbody").append(row);
+        });
+        $("#sortMessage").text("Sorted by Absences (Ascending)");
+    });
+
+    // Sort by Participation (Descending)
+    $("#sortPartBtn").on("click", function() {
+        const rows = $("#attendanceTable tbody tr").get();
+        rows.sort(function(a, b) {
+            const partA = parseInt($(a).find(".part").text(), 10);
+            const partB = parseInt($(b).find(".part").text(), 10);
+            return partB - partA;
+        });
+        $.each(rows, function(index, row) {
+            $("#attendanceTable tbody").append(row);
+        });
+        $("#sortMessage").text("Sorted by Participation (Descending)");
+    });
+});
      const toggle = document.querySelector('.nav-toggle');
       const links = document.querySelector('.nav-links');
       toggle?.addEventListener('click', () => links.classList.toggle('open'));
