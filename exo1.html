@@ -17,19 +17,69 @@
         <ul class="nav-links">
           <li><a href="index.html">Accueil</a></li>
           <li><a href="exo1.html">Liste d'assiduité</a></li>
-          <li><a href="exo2.html">Ajouter un etudiant</a></li>
-      <li><a href="login.html">login</a></li>
+          <li><a href="exo2.html">Ajouter étudiant</a></li>
+       <li><a href="login.html">login</a></li>
           <li><a href="logout.html">Déconnexion</a></li>
         </ul>
       </nav>
     </header>
     <main class="container">
-      
-      <p class="muted">Bienvenue consultez les statistiques détaillées, générez des graphiques
-et analysez l’évolution de l’assiduité.</p>
+      <h1>Rapports</h1>
+      <p class="muted">Section de rapports – contenu à compléter selon vos besoins.</p>
     </main>
     
   <style>
+    body {font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+    }
+
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .col-last, .col-first {
+      text-align: left;
+      padding-left: 10px;
+      font-weight: 600;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    td input {
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Dynamic colors */
+    .green-row td { background-color: #d4edda !important; }   /* good */
+    .yellow-row td { background-color: #fff3cd !important; }  /* warning */
+    .red-row td { background-color: #f8d7da !important; }     /* excluded */
+    /* We handle row hover highlighting via jQuery below */
     body {font-family: Arial, sans-serif;
       background: #f9f9f9;
       padding: 20px;
@@ -194,7 +244,6 @@ footer {
   text-align: center;
   padding: 12px;
 }
-
   </style>
 </head>
 <body>
@@ -238,7 +287,6 @@ footer {
         <th>P</th><th>Pa</th>
       </tr>
     </thead>
-
     <tbody>
       <tr>
         <td>Ahmed</td>
@@ -330,7 +378,6 @@ footer {
         updateRow(row);
       });
     });
-
     // ---------------- Ajout automatique des étudiants ----------------
 
     // Ajouter une nouvelle ligne pour un étudiant
@@ -360,7 +407,7 @@ footer {
 
     // Charger les étudiants ajoutés via addStudent.html
     function loadStudents() {
-      const students = JSON.parse(localStorage.getItem('students')) || [];
+      const students = JSON.parse(localStorage.getItem('students'))  ;
       const tbody = document.querySelector("#attendanceTable tbody");
 
       students.forEach(student => {
@@ -438,8 +485,7 @@ $(document).ready(function() {
         ctx.font = '14px Arial';
         ctx.textAlign = 'center';
         // Draw each bar
-        values.forEach((val, i) => {
-            const barHeight = (val / maxVal) * (height - 50);
+        values.forEach((val, i) => {const barHeight = (val / maxVal) * (height - 50);
             const x = i * barWidth + barWidth * 0.15;
             const barActualWidth = barWidth * 0.7;
             const y = height - barHeight - 20;
@@ -456,32 +502,53 @@ $(document).ready(function() {
         $("#reportSection").show();
     });
 
-    // Highlight Excellent Students button functionality
-    $("#highlightExcellentBtn").on("click", function() {
-        $("#attendanceTable tbody tr").each(function() {
-            const absences = parseInt($(this).find(".abs").text(), 10);
-            if (absences < 3) {
-                // animate background color change for excellent students
-                $(this).css('transition','background-color 1s');
-                $(this).css('background-color','#b3ffcc');
-            }
+   // Highlight Excellent Students button functionality
+$("#highlightExcellentBtn").on("click", function() {
+    $("#attendanceTable tbody tr").each(function() {
+
+        const absences = parseInt($(this).find(".abs").text(), 10);
+
+        if (absences < 3) {
+            // animation : fade + transition de couleur
+            $(this)
+                .fadeOut(200)
+                .fadeIn(200);
+
+            $(this).css({
+                "transition": "background-color 1s",
+                "background-color": "#b3ffcc"  // vert clair
+            });
+        }
+    });
+});
+
+       // Reset Colors button functionality
+       $("#resetColorsBtn").on("click", function() {
+
+    $("#attendanceTable tbody tr").each(function() {
+
+        // Effacer couleurs inline
+        $(this).css({
+            "background-color": "",
+            "color": "",
+            "transition": "",
+            "border-color": ""
         });
+
+        // ❗️ SUPPRIMER les classes de couleurs (*IMPORTANT*)
+        $(this).removeClass("green-row yellow-row red-row");
     });
 
-    // Reset Colors button functionality
-    $("#resetColorsBtn").on("click", function() {
-        $("#attendanceTable tbody tr").each(function() {
-            $(this).css('background-color','');
-        });
-    });
+});
 
+ 
     // Search by name functionality
     $("#searchInput").on("keyup", function() {
         const searchTerm = $(this).val().toLowerCase();
         $("#attendanceTable tbody tr").filter(function() {
             const last = $(this).children().eq(0).text().toLowerCase();
             const first = $(this).children().eq(1).text().toLowerCase();
-            $(this).toggle(last.includes(searchTerm) || first.includes(searchTerm));
+            $(this).toggle(last.includes(searchTerm) |first.includes(searchTerm));
         });
     });
 
